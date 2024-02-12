@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h2>This is HOME template</h2>
+
+<div>
+    <ul>
+    {% for room in rooms %}
+        <!--                     'room' is named in urls.py & following is dynamic params -->
+       <li>{{room.id}}: <a href="{% url 'room' room.id %}">{{room.name}}</a></li> 
+    {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
