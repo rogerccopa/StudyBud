@@ -1,11 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Room
-
-rooms = [
-    {'id':1, 'name':'Lets learn python'},
-    {'id':2, 'name':'Disign with me'},
-    {'id':3, 'name':' Frontend developers'}
-]
+from .forms import RoomForm
 
 def home(request):
     # context = {'rooms': rooms}
@@ -13,12 +8,24 @@ def home(request):
     return render(request, 'base/home.html', context)
 
 def room (request, pk):
-    selectedRoom = None
-
-    for room in rooms:
-        if room['id'] == int(pk):
-            selectedRoom = room
-    
+    selectedRoom = Room.objects.get(id = pk)
     context = {'room': selectedRoom}
 
     return render(request, 'base/room.html', context)
+
+def createRoom(request):
+    if request.method == 'POST':
+        form = RoomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    
+    form = RoomForm()
+    context = {'form': form}
+    return render(request, 'base/room_form.html', context)
+
+def updateRoom(request, pk):
+    room = Room.objects.get(id = pk)
+    form = RoomForm(instance=room)
+    context = {'form': form}
+    return render(request, 'base/room_form.html', context)

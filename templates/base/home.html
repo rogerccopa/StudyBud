@@ -4,10 +4,17 @@
 <h2>This is HOME template</h2>
 
 <div>
+    <a href="{% url 'create-room' %}">Create Room</a>
     <ul>
     {% for room in rooms %}
+        <a href="{% url 'update-room' room.id %}">Edit</a>
+        <span>@{{room.host.username}}</span>
+        
         <!--                     'room' is named in urls.py & following is dynamic params -->
        <li>{{room.id}}: <a href="{% url 'room' room.id %}">{{room.name}}</a></li> 
+
+       <small>{{room.topic.name}}</small>
+       <hr>
     {% endfor %}
     </ul>
 </div>
