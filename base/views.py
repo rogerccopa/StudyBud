@@ -3,10 +3,9 @@ from .models import Room, Topic
 from .forms import RoomForm
 
 def home(request):
-    q = request.GET.get('q')
-    # rooms = Room.objects.all()
-    # CONTINUE HERE...
-    rooms = Room.objects.filter(topic__name = q)
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    # double underscore allows access to the related table's fields
+    rooms = Room.objects.filter(topic__name__contains = q)
     topics = Topic.objects.all()
     context = {'rooms': rooms, 'topics': topics}
     return render(request, 'base/home.html', context)
