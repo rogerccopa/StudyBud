@@ -24,8 +24,10 @@
         <a href="{% url 'create-room' %}">Create Room</a>
         <ul>
         {% for room in rooms %}
-            <a href="{% url 'update-room' room.id %}">Edit</a>
-            <a href="{% url 'delete-room' room.id %}">Delete</a>
+            {% if room.host == request.user %}
+                <a href="{% url 'update-room' room.id %}">Edit</a>
+                <a href="{% url 'delete-room' room.id %}">Delete</a>
+            {% endif %}
             <span>@{{room.host.username}}</span>
             
             <!--                     'room' is named in urls.py & following is dynamic params -->

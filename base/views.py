@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.db.models import Q  # Q allows to use and/or to filter objects
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 
 from pprint import pprint
@@ -12,6 +13,11 @@ from .models import Room, Topic
 from .forms import RoomForm
 
 def loginPage(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
+    page = 'login'
+
     if request.method == 'POST':
         un = request.POST.get('username')
         pw = request.POST.get('password')
@@ -29,8 +35,21 @@ def loginPage(request):
             else:
                 messages.error(request, 'User or password does not exist')
             
-    context = {}
+    context = {'page':page}
     return render(request, 'base/login_register.html', context)
+
+def registerPage(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            return redirect('home')
+        else:
+            messages.error(request, 'an error occurred during registration')
+
+    form = UserCreationForm()
+    return render(request, 'base/login_register.html', {'form':form})
 
 def logoutUser(request):
     logout(request)
@@ -52,7 +71,8 @@ def home(request):
 
 def room (request, pk):
     selectedRoom = Room.objects.get(id = pk)
-    context = {'room': selectedRoom}
+    room_messages = selectedRoom.message_set.all().order_by('-created')
+    context = {'room': selectedRoom, 'room_messages': room_messages}
 
     return render(request, 'base/room.html', context)
 
