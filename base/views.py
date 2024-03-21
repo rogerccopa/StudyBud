@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 
 from pprint import pprint
 
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm
 
 def loginPage(request):
@@ -72,7 +72,22 @@ def home(request):
 def room (request, pk):
     selectedRoom = Room.objects.get(id = pk)
     room_messages = selectedRoom.message_set.all().order_by('-created')
-    context = {'room': selectedRoom, 'room_messages': room_messages}
+    participants = selectedRoom.participants.all()
+
+    if request.method == 'POST':
+        msg = Message.objects.create(
+            user = request.user,
+            room = selectedRoom,
+            body = request.POST['comment']
+        )
+
+        return redirect('room', pk=selectedRoom.id)
+    
+    context = {
+        'room': selectedRoom, 
+        'room_messages': room_messages,
+        'participatns': participants
+    }
 
     return render(request, 'base/room.html', context)
 
