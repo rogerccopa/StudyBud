@@ -81,12 +81,14 @@ def room (request, pk):
             body = request.POST['comment']
         )
 
+        selectedRoom.participants.add(request.user)
+
         return redirect('room', pk=selectedRoom.id)
     
     context = {
         'room': selectedRoom, 
         'room_messages': room_messages,
-        'participatns': participants
+        'participants': participants
     }
 
     return render(request, 'base/room.html', context)
@@ -132,3 +134,16 @@ def deleteRoom(request, pk):
         return redirect('home')
     
     return render(request, 'base/delete.html', {'obj': room})
+
+@login_required(login_url='login')
+def deleteMessage(request, pk):
+    message = Message.objects.get(id = pk)
+
+    if message.user != request.user:
+        return HttpResponse("You are not allowed here")
+    
+    if request.method == 'POST':
+        message.delete()
+        return redirect('home')
+
+    return render(request, 'base/delete.html', {'obj':message})
